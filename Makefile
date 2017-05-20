@@ -55,7 +55,7 @@ clean:
 
 fclean: clean
 	@make -C $(LDIR) fclean
-	@$(RM) -rf $(NAME)
+	@$(RM) -rf $(MAIN)
 	@echo "[ ./minishell ] removed"
 
 re: fclean all
