@@ -1,25 +1,37 @@
-#include <stdio.h>
-#include <libft.h>
 #include <minishell.h>
-#include <stdlib.h>
-#include <sys/wait.h>
+
+static void run_sh(t_prompt *sh)
+{
+	print_prompt();
+	sh->agv = wait_cmd(sh->cmd, sh->history);
+	if (isBuiltin(*sh->agv))
+		sh->exit = exec_builtin((const char **)sh->agv, sh->env, sh->history);
+	else
+		sh->exit = exec_file(*sh->agv, (const char **)sh->agv);
+	free_tab(sh->agv);
+	ft_strdel(&sh->cmd);
+}
+
+static void init_sh(t_prompt *sh, char **ev)
+{
+	ft_bzero(&*sh, sizeof(t_prompt));
+	sh->env = make_env(ev);
+	if (sh->env)
+		sh->exit = 1;
+}
 
 int		main(int ac, char **av, char **ev)
 {
-	char	*line;
+	t_prompt	sh;
 
-	(void)av;
-	(void)ev;
-	(void)ac;
-	line = 0;
-	while (1)
+	if (ac == 1)
 	{
-		printf("minishell >");
-		if (!get_next_line(0, &line))
-			return (0);
-		if (!ft_strcmp(line, "exit"))
-			exit(1);
-	//	free(line);
-		wait(0);
+		(void)av;
+		init_sh(&sh, ev);
+		while (42)
+			run_sh(&sh);
 	}
+	else
+		ft_putendl_fd("minishell: usage: ./minishell", 2);
+	return (0);
 }

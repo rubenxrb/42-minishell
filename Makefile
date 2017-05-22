@@ -17,7 +17,7 @@ LDIR = $(SDIR)libft/
 LIBFT = $(LDIR)libft.a
 LNK = -L$(LDIR) -lft
 
-SRCN = prompt.c utils.c cmd_parse.c	\
+SRCN = prompt.c utils.c cmd.c	\
 	background.c
 BLTN = ft_cat.c ft_echo.c ft_env.c ft_cd.c
 
@@ -31,14 +31,14 @@ BOBJ =	$(addprefix $(OBND),$(OBLTN))
 all: $(MAIN)
 
 $(MAIN): lib mkobj $(SOBJ) $(BOBJ)
-	$(CC) $(CFLAGS) -o $(MAIN) $(SDIR)main.c $(LNK) $(SOBJ) $(BOBJ) $(INC)
-	@echo "[ ./minishell ] compiled!"
+	$(CC) $(CFLAGS) -o $(MAIN) $(SDIR)main.c $(INC) $(SOBJ) $(BOBJ) $(LNK)
+	@printf "\x1b[36m[ ./minishell ] <compiled>\n\x1b[0m"
 
 obj/sh/%.o:src/sh/%.c
-	$(CC) $(CFLAGS) $(INC) -o $@ -c $<
+	$(CC) $(CFLAGS) $(INC) $(LNK) -o $@ -c $<
 
 obj/bin/%.o:src/bin/%.c
-	$(CC) $(CFLAGS) $(INC) -o $@ -c $<
+	$(CC) $(CFLAGS) $(INC) $(LNK) -o $@ -c $<
 
 mkobj:
 	@mkdir -p $(ODIR)
@@ -51,12 +51,12 @@ lib:
 clean:
 	@make -C $(LDIR) clean
 	@$(RM) -rf $(ODIR)
-	@echo "[ ./obj/ ] removed"
+	@printf "\x1b[31m[./obj/] <removed>\n\x1b[0m"
 
 fclean: clean
 	@make -C $(LDIR) fclean
 	@$(RM) -rf $(MAIN)
-	@echo "[ ./minishell ] removed"
+	@printf "\x1b[31m[./minishell] <removed>\n\x1b[0m"
 
 re: fclean all
 .PHONY: all clean fclean re
