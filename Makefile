@@ -17,14 +17,14 @@ LDIR = $(SDIR)libft/
 LIBFT = $(LDIR)libft.a
 LNK = -L$(LDIR) -lft
 
-SRCN = prompt.c utils.c cmd.c	\
-	background.c
-BLTN = ft_cat.c ft_echo.c ft_env.c ft_cd.c
+SRCN = prompt.c utils.c cmd.c background.c
+BLTN = ft_cat.c ft_echo.c ft_env.c ft_cd.c	\
+	ft_history.c ft_up.c
 
 SOBJN = $(SRCN:.c=.o)
 OBLTN = $(BLTN:.c=.o)
 SRC :=	$(addprefix $(SHLL),$(SRCN))
-BLT =	$(addprefix $(SBIN),$(BLTN))
+BLT :=	$(addprefix $(SBIN),$(BLTN))
 SOBJ =	$(addprefix $(OSHD),$(SOBJN))
 BOBJ =	$(addprefix $(OBND),$(OBLTN))
 

@@ -10,12 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_MSHBUILTIN_H
-#include <libft.h>
+#ifndef FT_BUILTIN_H
+# define FT_BUILTIN_H
+# include <libft.h>
 
 int		ft_cat(const char **av);
 int		ft_cd(const char **av, t_lst *env);
 int		ft_echo(const char **av, t_lst *env);
-int		ft_env(const char **av, t_lst *env, t_byte cmd);
+int		ft_env(const char **av, t_lst *env, char cmd);
+int		ft_up(const char **av, t_lst *env);
+int		ft_history(const char **av, t_lst *env);
 
 #endif

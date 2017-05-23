@@ -11,9 +11,11 @@
 /* ************************************************************************** */
 
 #ifndef FT_MINISHELL_H
-#include <libft.h>
+# define FT_MINISHELL_H
+# include <libft.h>
+# include <builtin.h>
 
-# define HSTRY_L 50
+# define HISTORY_MAX 50
 
 
 typedef struct prompt
@@ -31,7 +33,7 @@ void		print_prompt(void);
 /* cmd */
 char		**wait_cmd(char *line, t_lst *history);
 t_byte		exec_builtin(const char **av, t_lst *env, t_lst *history);
-t_byte		exec_file(const char *filename, const char **av);
+t_byte		exec_file(const char *filename, const char **av, t_lst *env);
 
 /* background */
 t_lst	*make_env(char **ev);
@@ -39,5 +41,6 @@ t_lst	*make_env(char **ev);
 
 /* utils */
 t_byte		isBuiltin(const char *cmd);
+void		update_history(t_lst *history, char *line);
 
 #endif

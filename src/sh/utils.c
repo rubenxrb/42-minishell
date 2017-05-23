@@ -4,6 +4,8 @@ t_byte	isBuiltin(const char *cmd)
 {
 	if (!ft_strcmp(cmd, "cd"))
 		return (1);
+	else if (!ft_strcmp(cmd, "clear"))
+		return (1);
 	else if (!ft_strcmp(cmd, "exit"))
 		return (1);
 	else if (!ft_strcmp(cmd, "echo"))
@@ -21,4 +23,23 @@ t_byte	isBuiltin(const char *cmd)
 	else if (!ft_strcmp(cmd, "history"))
 		return (1);
 	return (0);
+}
+
+void	update_history(t_lst *history, char *line)
+{
+	t_dlnode	*old;
+	t_dlnode	*tmp;
+
+	if (history->len < HISTORY_MAX)
+		dllst_addstr(history, line);
+	else
+	{
+		dllst_addstr(history, line);
+		old = history->tail;
+		tmp = old->prev;
+		tmp->next = 0;
+		history->tail = tmp;
+		ft_memdel((void **)&old);
+		history->len--;
+	}
 }

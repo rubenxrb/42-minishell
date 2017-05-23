@@ -7,20 +7,24 @@ static void run_sh(t_prompt *sh)
 	if (isBuiltin(*sh->agv))
 		sh->exit = exec_builtin((const char **)sh->agv, sh->env, sh->history);
 	else
-		sh->exit = exec_file(*sh->agv, (const char **)sh->agv);
+		sh->exit = exec_file(*sh->agv, (const char **)sh->agv, sh->env);
 	free_tab(sh->agv);
 	ft_strdel(&sh->cmd);
 }
 
 static void init_sh(t_prompt *sh, char **ev)
 {
+	t_lst		*env;
+
 	ft_bzero(&*sh, sizeof(t_prompt));
-	sh->env = make_env(ev);
-	if (sh->env)
-		sh->exit = 1;
+	env = ft_memalloc(sizeof(t_lst));
+	sh->history = ft_memalloc(sizeof(t_lst));
+	while (*ev)
+		dllst_addstr(env, *ev++);
+	sh->env = env;
 }
 
-int		main(int ac, char **av, char **ev)
+int			main(int ac, char **av, char **ev)
 {
 	t_prompt	sh;
 
