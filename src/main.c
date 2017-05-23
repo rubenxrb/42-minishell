@@ -5,9 +5,9 @@ static void run_sh(t_prompt *sh)
 	print_prompt();
 	sh->agv = wait_cmd(sh->cmd, sh->history);
 	if (isBuiltin(*sh->agv))
-		sh->exit = exec_builtin((const char **)sh->agv, sh->env, sh->history);
+		sh->status = exec_builtin((const char **)sh->agv, sh->env, sh->history);
 	else
-		sh->exit = exec_file(*sh->agv, (const char **)sh->agv, sh->env);
+		sh->status = exec_file(*sh->agv, (const char **)sh->agv, sh->env);
 	free_tab(sh->agv);
 	ft_strdel(&sh->cmd);
 }

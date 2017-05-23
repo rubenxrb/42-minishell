@@ -1,4 +1,13 @@
 #include <minishell.h>
+#include <stdlib.h>
+
+void	not_found(const char *cmd)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(cmd, 2);
+	ft_putendl_fd(": command not found", 2);
+	exit(0);
+}
 
 t_byte	isBuiltin(const char *cmd)
 {

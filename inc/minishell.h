@@ -22,7 +22,7 @@ typedef struct prompt
 {
 	char	*cmd;
 	char	**agv;
-	t_byte	exit;
+	int		status;
 	t_lst	*env;
 	t_lst	*history; /*numeric arguments required */
 }			t_prompt;
@@ -32,8 +32,8 @@ void		print_prompt(void);
 
 /* cmd */
 char		**wait_cmd(char *line, t_lst *history);
-t_byte		exec_builtin(const char **av, t_lst *env, t_lst *history);
-t_byte		exec_file(const char *filename, const char **av, t_lst *env);
+int		exec_builtin(const char **av, t_lst *env, t_lst *history);
+int		exec_file(const char *filename, const char **av, t_lst *env);
 
 /* background */
 t_lst	*make_env(char **ev);
@@ -42,5 +42,6 @@ t_lst	*make_env(char **ev);
 /* utils */
 t_byte		isBuiltin(const char *cmd);
 void		update_history(t_lst *history, char *line);
+void		not_found(const char *cmd);
 
 #endif

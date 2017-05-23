@@ -3,6 +3,47 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
+
+/*
+	return array of paths, extracted from env node
+*/
+static char	**env_path(t_lst *env)
+{
+	char		**path;
+	t_dlnode	*node;
+	char		*p;
+
+	node = dllst_findstr(env, "PATH=", 1);
+	p = ft_strchr(node->data, '=');
+	path = 0;
+	if (!node || !p)
+		return (0);
+	else if (*++p)
+		path = ft_strsplit(p, ':');
+	return (path);
+}
+
+/*
+	loop through paths, create full path
+	check file permissions, error and exit if no permissions
+	exec if found, error if bin not found
+*/
+static int	lookup_path(const char *fn, char **av, char **path)
+{
+	int		i;
+	char	*full;
+
+	i = 0;
+	while (*(path + i))
+	{
+		full = ft_strjoin(*(path + i), fn);
+		if (execv((char *)fn, av) < 0)
+			return (-1);
+		ft_strdel(&full);
+	}
+	return (0);
+}
+
 char		**wait_cmd(char *line, t_lst *history)
 {
 	char	**cmd;
@@ -21,14 +62,14 @@ char		**wait_cmd(char *line, t_lst *history)
 	return (cmd);
 }
 
-t_byte		exec_builtin(const char **av, t_lst *env, t_lst *history)
+int		exec_builtin(const char **av, t_lst *env, t_lst *history)
 {
 	if (!ft_strcmp(*av, "cd"))	//need - handle: cd ~, -, update $HOME call pwd
 		return (ft_cd(av, env));
 	else if (!ft_strcmp(*av, "clear"))
 		ft_putstr("\e[1;1H\e[2J");
 	else if (!ft_strcmp(*av, "exit"))
-		exit(1);
+		exit(0);
 	else if (!ft_strcmp(*av, "echo")) //need handle -n, -e (escape seq), -E (def)
 		return (ft_echo(av, env));
 	else if (!ft_strcmp(*av, "env")) //needs work - filter vars, -i/-(start new nev)
@@ -46,17 +87,30 @@ t_byte		exec_builtin(const char **av, t_lst *env, t_lst *history)
 	return (0);
 }
 
-/* split paths, look binaries in paths, run if found */
-//get path node in lst
-//split paths and search bin in paths
-//fork process
-//parent wait child, loop and search paths in child process
-//execute binary in child, exit status for $? env
-//exit child if bin not found in path
-t_byte		exec_file(const char *filename, const char **av, t_lst *env)
+/*
+	get array of strings of all paths
+	fork, as parent - wait for child
+	as child look up path for bin
+		exit child if bin not found in path, else execute
+	BONUS ($? env): save exit status, 127 if not found, -1 error, etc
+*/
+int		exec_file(const char *filename, const char **av, t_lst *env)
 {
-	(void)filename;
-	(void)av;
-	(void)env;
-	return 1;
+	char	**paths;
+	int		status;
+	pid_t	pid;
+
+	paths = env_path(env);
+	pid = fork();
+	status = 0;
+	if (pid)
+		wait(&pid);
+	else if (!pid)
+	{
+		status = lookup_path(filename, (char **)av, paths);
+		if (status < 0)
+			not_found(filename);
+	}
+	free_tab(paths);
+	return (status);
 }
