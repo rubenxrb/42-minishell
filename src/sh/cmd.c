@@ -78,7 +78,6 @@ char		**wait_cmd(char **line, t_lst *history)
 
 int		exec_builtin(char **av, t_lst *env, t_lst *history, int exit_s)
 {
-	(void)exit_s;
 	if (!ft_strcmp(*av, "cd"))	//need - handle: cd ~, -, update $HOME call pwd
 		return (ft_cd((const char **)av, env));
 	else if (!ft_strcmp(*av, "clear"))
@@ -86,7 +85,7 @@ int		exec_builtin(char **av, t_lst *env, t_lst *history, int exit_s)
 	else if (!ft_strcmp(*av, "exit"))
 		exit(0);
 	else if (!ft_strcmp(*av, "echo")) //need handle -n, -e (escape seq), -E (def)
-		return ft_echo((const char **)av, env);
+		return ft_echo((const char **)av, env, exit_s);
 	else if (!ft_strcmp(*av, "env")) //needs work - filter vars, -i/-(start new nev)
 		return (ft_env((const char **)av, env, 0));
 	else if (!ft_strcmp(*av, "setenv")) //needs work -0(0 instead of '\n')u

@@ -10,9 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_BUILTIN_H
-# define FT_BUILTIN_H
-# include <libft.h>
+#ifndef BUILTIN_H
+# define BUILTIN_H
+#include <minishell.h>
+//# include <libft.h>
 
 int		ft_cat(const char **av);
 int		ft_cd(const char **av, t_lst *env);
