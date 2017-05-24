@@ -46,4 +46,5 @@ t_byte		isBuiltin(const char *cmd);
 void		update_history(t_lst *history, char *line);
 void		not_found(const char *cmd);
 
+
 #endif

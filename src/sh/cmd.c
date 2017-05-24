@@ -1,4 +1,5 @@
 #include <minishell.h>
+#include <builtin.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +86,7 @@ int		exec_builtin(char **av, t_lst *env, t_lst *history, int exit_s)
 	else if (!ft_strcmp(*av, "exit"))
 		exit(0);
 	else if (!ft_strcmp(*av, "echo")) //need handle -n, -e (escape seq), -E (def)
-		return ft_echo((const char **)av, env, exit_s);
+		return (ft_echo((const char **)av, env, exit_s));
 	else if (!ft_strcmp(*av, "env")) //needs work - filter vars, -i/-(start new nev)
 		return (ft_env((const char **)av, env, 0));
 	else if (!ft_strcmp(*av, "setenv")) //needs work -0(0 instead of '\n')u
