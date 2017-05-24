@@ -1,5 +1,6 @@
 #include <minishell.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 
@@ -13,11 +14,16 @@ static char	**env_path(t_lst *env)
 	t_dlnode	*node;
 	char		*p;
 
-	node = dllst_findstr(env, "PATH=", 1);
-	p = ft_strchr(node->data, '=');
+	p = 0;
 	path = 0;
+	node = dllst_findstr(env, "PATH=", 1);
+	if (node)
+		p = ft_strchr(node->data, '=');
 	if (!node || !p)
-		return (0);
+	{
+		ft_putendl("Path not found, exiting");
+		exit (1);
+	}
 	else if (*++p)
 		path = ft_strsplit(p, ':');
 	return (path);
@@ -33,6 +39,8 @@ static int	lookup_path(const char *fn, char **av, char **path)
 	int		i;
 	char	*full;
 
+	if (!path)
+		return (-1);
 	i = 0;
 	while (*(path + i))
 	{
@@ -100,17 +108,21 @@ int		exec_file(const char *filename, const char **av, t_lst *env)
 	int		status;
 	pid_t	pid;
 
-	paths = env_path(env);
+	paths = 0;
+	ft_putendl("Parent forking..");
 	pid = fork();
 	status = 0;
 	if (pid)
 		wait(&pid);
 	else if (!pid)
 	{
+		printf("Child %d looking for '%s'\n", (int)pid, (char *)filename);
+		paths = env_path(env);
 		status = lookup_path(filename, (char **)av, paths);
 		if (status < 0)
 			not_found(filename);
 	}
-	free_tab(paths);
+	if (paths)
+		free_tab(paths);
 	return (status);
 }
