@@ -6,7 +6,6 @@ int		ft_env(const char **av, t_lst *env, char cmd)
 {
 	char		**ptr;
 
-	printf("elements in lst: '%zu'\n", env->len);
 	if (cmd > 0)
 	{
 		ptr = (char **)av + 1;
@@ -19,6 +18,7 @@ int		ft_env(const char **av, t_lst *env, char cmd)
 		while (*ptr)
 			dllst_delstr(env, *ptr++, 1);
 	}
-	dllst_print(env, 1);
+	else
+		dllst_print(env, 1);
 	return (0);
 }

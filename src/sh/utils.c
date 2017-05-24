@@ -1,12 +1,13 @@
 #include <minishell.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void	not_found(const char *cmd)
 {
 	ft_putstr_fd("minishell: ", 2);
 	ft_putstr_fd(cmd, 2);
 	ft_putendl_fd(": command not found", 2);
-	exit(0);
+	exit(NOT_FOUND);
 }
 
 t_byte	isBuiltin(const char *cmd)
@@ -36,7 +37,6 @@ t_byte	isBuiltin(const char *cmd)
 
 void	update_history(t_lst *history, char *line)
 {
-	t_dlnode	*old;
 	t_dlnode	*tmp;
 
 	if (history->len < HISTORY_MAX)
@@ -44,11 +44,10 @@ void	update_history(t_lst *history, char *line)
 	else
 	{
 		dllst_addstr(history, line);
-		old = history->tail;
-		tmp = old->prev;
-		tmp->next = 0;
-		history->tail = tmp;
-		ft_memdel((void **)&old);
+		tmp = history->head;
+		history->head = tmp->next;
+		tmp->next->prev = 0;
+		dlnode_free(&tmp);
 		history->len--;
 	}
 }

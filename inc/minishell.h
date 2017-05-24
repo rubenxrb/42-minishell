@@ -15,14 +15,16 @@
 # include <libft.h>
 # include <builtin.h>
 
-# define HISTORY_MAX 50
+# define HISTORY_MAX 5
+# define NOT_FOUND 127
+# define NO_FILE 2
 
 
 typedef struct prompt
 {
 	char	*cmd;
 	char	**agv;
-	int		status;
+	int		exit;
 	t_lst	*env;
 	t_lst	*history; /*numeric arguments required */
 }			t_prompt;
@@ -31,9 +33,9 @@ typedef struct prompt
 void		print_prompt(void);
 
 /* cmd */
-char		**wait_cmd(char *line, t_lst *history);
-int		exec_builtin(const char **av, t_lst *env, t_lst *history);
-int		exec_file(const char *filename, const char **av, t_lst *env);
+char		**wait_cmd(char **line, t_lst *history);
+int		exec_builtin(char **av, t_lst *env, t_lst *history, int exit_s);
+int		exec_file(const char *filename, char **av, t_lst *env);
 
 /* background */
 t_lst	*make_env(char **ev);

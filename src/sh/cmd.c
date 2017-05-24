@@ -14,16 +14,11 @@ static char	**env_path(t_lst *env)
 	t_dlnode	*node;
 	char		*p;
 
-	p = 0;
 	path = 0;
 	node = dllst_findstr(env, "PATH=", 1);
-	if (node)
-		p = ft_strchr(node->data, '=');
+	p = node ? ft_strchr(node->data, '=') : 0;
 	if (!node || !p)
-	{
-		ft_putendl("Path not found, exiting");
-		exit (1);
-	}
+		return (0);
 	else if (*++p)
 		path = ft_strsplit(p, ':');
 	return (path);
@@ -36,62 +31,74 @@ static char	**env_path(t_lst *env)
 */
 static int	lookup_path(const char *fn, char **av, char **path)
 {
-	int		i;
 	char	*full;
+	char	*dir;
+	int		ret;
+	int		i;
 
-	if (!path)
-		return (-1);
-	i = 0;
-	while (*(path + i))
+	ret = -1;
+	if (path)
 	{
-		full = ft_strjoin(*(path + i), fn);
-		if (execv((char *)fn, av) < 0)
-			return (-1);
-		ft_strdel(&full);
+		i = 0;
+		while (*(path + i))
+		{
+			dir = ft_strjoin(*(path + i++), "/");
+			full = ft_strjoin(dir, fn);
+			ret = execv(full, av);
+			ft_strdel(&dir);
+			ft_strdel(&full);
+		}
 	}
-	return (0);
+	return (ret);
 }
 
-char		**wait_cmd(char *line, t_lst *history)
+char		**wait_cmd(char **line, t_lst *history)
 {
 	char	**cmd;
 
 	cmd = 0;
-	if (get_next_line(0, &line) < 0)
+	if (get_next_line(0, line) < 0)
 	{
 		ft_putendl_fd("minishell: error: reading from stdin", 2);
 		exit(1);
 	}
-	if (line)
+	if (!ft_strncmp(*line, "\n", 1))
 	{
-		cmd = split_blnk(line);
-		update_history(history, line);
+		ft_strdel(line);
+		return (0);
+	}
+	if (*line && **line)
+	{
+
+		cmd = split_blnk(*line);
+		update_history(history, *line);
 	}
 	return (cmd);
 }
 
-int		exec_builtin(const char **av, t_lst *env, t_lst *history)
+int		exec_builtin(char **av, t_lst *env, t_lst *history, int exit_s)
 {
+	(void)exit_s;
 	if (!ft_strcmp(*av, "cd"))	//need - handle: cd ~, -, update $HOME call pwd
-		return (ft_cd(av, env));
+		return (ft_cd((const char **)av, env));
 	else if (!ft_strcmp(*av, "clear"))
 		ft_putstr("\e[1;1H\e[2J");
 	else if (!ft_strcmp(*av, "exit"))
 		exit(0);
 	else if (!ft_strcmp(*av, "echo")) //need handle -n, -e (escape seq), -E (def)
-		return (ft_echo(av, env));
+		return ft_echo((const char **)av, env);
 	else if (!ft_strcmp(*av, "env")) //needs work - filter vars, -i/-(start new nev)
-		return (ft_env(av, env, 0));
+		return (ft_env((const char **)av, env, 0));
 	else if (!ft_strcmp(*av, "setenv")) //needs work -0(0 instead of '\n')u
-		return (ft_env(av, env, 1));
+		return (ft_env((const char **)av, env, 1));
 	else if (!ft_strcmp(*av, "unsetenv")) //needs -u(--unset=NAME)
-		return (ft_env(av, env, -1));
+		return (ft_env((const char **)av, env, -1));
 	else if (!ft_strcmp(*av, "cat")) //need - !file(stdin), -n("   %d %line"), -e($)
-		return (ft_cat(av));
+		return (ft_cat((const char **)av));
 	else if (!ft_strcmp(*av, "up")) //need - up [num]
-		return (ft_up(av, env));
+		return (ft_up((const char **)av, env));
 	else if (!ft_strcmp(*av, "history")) //needs -c(delete lst)
-		return (ft_history(av, history));
+		return (ft_history((const char **)av, history));
 	return (0);
 }
 
@@ -102,27 +109,25 @@ int		exec_builtin(const char **av, t_lst *env, t_lst *history)
 		exit child if bin not found in path, else execute
 	BONUS ($? env): save exit status, 127 if not found, -1 error, etc
 */
-int		exec_file(const char *filename, const char **av, t_lst *env)
+int		exec_file(const char *filename, char **av, t_lst *env)
 {
 	char	**paths;
 	int		status;
 	pid_t	pid;
 
 	paths = 0;
-	ft_putendl("Parent forking..");
 	pid = fork();
 	status = 0;
 	if (pid)
 		wait(&pid);
 	else if (!pid)
 	{
-		printf("Child %d looking for '%s'\n", (int)pid, (char *)filename);
 		paths = env_path(env);
-		status = lookup_path(filename, (char **)av, paths);
+		status = lookup_path(filename, av, paths);
 		if (status < 0)
 			not_found(filename);
 	}
 	if (paths)
 		free_tab(paths);
-	return (status);
+	return (WEXITSTATUS(pid));
 }
