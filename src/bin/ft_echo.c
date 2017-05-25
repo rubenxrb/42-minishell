@@ -1,5 +1,4 @@
 #include <builtin.h>
-#include <stdio.h>
 
 static void		trim_entry(const char *var)
 {
@@ -29,7 +28,9 @@ static void		print_env(const char *var, t_lst *env)
 		}
 	}
 }
-
+/*
+ *	Make escape sequence conversion correctly, print nl if needed
+ */
 static char		*convert_bslash(const char *str)
 {
 	char	*ptr;
@@ -39,7 +40,7 @@ static char		*convert_bslash(const char *str)
 
 	seq_n = 0;
 	ptr = (char *)str;
-	while (*ptr)
+	while (*ptr && *(ptr + 1))
 		if (isEscapeSeq(ptr++, 2))
 			seq_n++;
 	ret = ft_strnew(ft_strlen(str) - seq_n);
@@ -74,6 +75,7 @@ static void		echo_print(const char **av, t_lst *env, t_byte n, t_byte e)
 		else if (e)
 		{
 			tmp = convert_bslash(*(av + i));
+		//	printf("converted '%s'\n", tmp);
 			global ? print_env(*(av + i), env) : trim_entry(tmp);
 			ft_strdel(&tmp);
 		}
