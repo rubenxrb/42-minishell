@@ -31,6 +31,7 @@ typedef struct prompt
 
 /* prompt */
 void		print_prompt(void);
+void		print_subprompt(void);
 
 /* cmd */
 char		**wait_cmd(char **line, t_lst *history);

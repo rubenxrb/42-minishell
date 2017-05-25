@@ -9,7 +9,28 @@
  */
 int		ft_up(const char **av, t_lst *env)
 {
-	(void)av;
-	(void)env;
-	return (0);
+	size_t	i;
+	int		up;
+	int		ret;
+
+	i = 0;
+	ret = 0;
+	while (*(av + i))
+		i++;
+	if (i > 2)
+	{
+		ft_putendl_fd("minishell: up: too many arguments", 2);
+		return (1);
+	}
+	if (!*(av + 1))
+		return (change_dir("../", env));
+	else if (!ft_strcmp(*(av + 1), "-help"))
+	{
+		ft_putendl("up [NUMBER]");
+		return (0);
+	}
+	up = ft_atoi(*(av + 1));
+	while (up--)
+		ret = change_dir("../", env);
+	return (ret);
 }

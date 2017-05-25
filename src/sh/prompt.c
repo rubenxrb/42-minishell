@@ -3,6 +3,11 @@
 #include <unistd.h> //getcwd
 #include <limits.h>
 
+void	print_subprompt(void)
+{
+	putcstr(" >> ", 36);
+}
+
 void	print_prompt(void)
 {
 	char	cwd[PATH_MAX];

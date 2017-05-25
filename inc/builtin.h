@@ -15,6 +15,7 @@
 # include <libft.h>
 
 int		ft_cat(const char **av);
+int 	change_dir(const char *dir, t_lst *env);
 int		ft_cd(const char **av, t_lst *env);
 int		ft_echo(const char **av, t_lst *env, int exit_s);
 int		ft_env(const char **av, t_lst *env, char cmd);
