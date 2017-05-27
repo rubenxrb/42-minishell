@@ -1,79 +1,55 @@
 #include <builtin.h>
-#include <stdio.h>
-/*
-static void		trim_entry(const char *var)
+
+static void		putescapestr(char *str)
 {
-	while (*var)
+	char	*p;
+	char	seq[3];
+
+	ft_bzero(seq, 3);
+	p = str;
+	while (*p)
 	{
-		if (*var == '"')
-			var++;
-		else
-			ft_putchar(*var++);
-	}
-}
-
-static void		print_env(const char *var, t_lst *env)
-{
-	t_byte		quote;
-	t_dlnode	*node;
-	char		*name;
-
-	quote = 0;
-	name = (char *)var;
-	if (*name == '"')
-	{
-		quote = 1;
-		name = ft_strsub(name, 1, ft_strlen(name) - 2);
-		printf("subname: '%s'\n", name);
-	}
-	if (name + 1)
-	{
-		if (!(node = dllst_findstr(env, name + 1, 1)))
-			return ;
-		else if (node->data)
-			ft_putstr(node->data);
-	}
-	if (quote)
-		ft_strdel(&name);
-}
-
- *	Make escape sequence conversion correctly, print nl if needed
-
-static char		*convert_bslash(const char *str)
-{
-	char	*ptr;
-	char	*ret;
-	char	seq[2];
-	size_t	seq_n;
-
-	seq_n = 0;
-	ptr = (char *)str;
-	while (*ptr && *(ptr + 1))
-		if (isEscapeSeq(ptr++, 2))
-			seq_n++;
-	ret = ft_strnew(ft_strlen(str) - seq_n);
-	ptr = ret;
-	while (*str)
-	{
-		if (*str == 0x5c)
+		if (isEscapeSeq(p, 2))
 		{
-			ft_memcpy(&seq, str, 2);
-			*ptr++ = escape_seq(seq);
-			str = str + 2 ? str + 2 : str + 1;
+			ft_memcpy(seq, p, 2);
+			ft_putchar(escape_seq(seq));
+			p = p + 2 ? p + 2: p  + 1;
 		}
 		else
-			*ptr++ = *str++;
+		{
+			if (*p != 0x22)
+				ft_putchar(*p);
+			p++;
+		}
 	}
-	return (ret);
 }
-*/
 
-static void		echo_print(const char *av, t_lst *env, t_byte n, t_byte e)
+static void		echo_print(const char *av, t_lst *env, t_byte e)
 {
-	(void)av;
-	(void)env;
-	(void)n;
-	(void)e;
+	t_dlnode	*tmp;
+	char		*quote;
+
+	if (*av == 0x22)
+		quote = ft_strsub(av, 1, ft_strlen(av) - 2);
+	if ((quote && *quote == '$') || *av == '$')
+	{
+		tmp = dllst_findstr(env, quote + 1, 1);
+		if (tmp)
+			ft_putstr(ft_strchr(tmp->data, '=') + 1);
+	}
+	else
+	{
+		if (e)
+			putescapestr((char *)av);
+		else
+			while (*av)
+			{
+				if ((*(av - 1) && *av != 0x22) || (*(av + 1) && *av != 0x22))
+					ft_putchar(*av++);
+				else
+					av++;
+			}
+	}
 }
 
 /*
@@ -88,8 +64,6 @@ int		ft_echo(const char **av, t_lst *env, int exit_s)
 	t_byte		n;
 	t_byte		e;
 
-	n = 0;
-	e = 0;
 	i = 1;
 	if (*(av + i))
 	{
@@ -98,13 +72,17 @@ int		ft_echo(const char **av, t_lst *env, int exit_s)
 		else if (!ft_strcmp(*(av + i), "-e"))
 			e = 1;
 		if (!ft_strcmp(*(av + i), "$?"))
-			ft_putnbrnl(exit_s);
+			ft_putnbr(exit_s);
 		else if (!ft_strcmp(*(av + i), "-help"))
-			ft_putendl("echo [OPTION]... [STRING]...");
-		while (*(av + i))
-			echo_print(*(av + i++), env, n, e);
+			ft_putstr("echo [OPTION]... [STRING]...");
+		else
+			while (*(av + i + n + e))
+			{
+				echo_print(*(av + i + n + e), env, e);
+				if (*(av + i++ + n + e))
+					ft_putchar(' ');
+			}
 	}
-	else
-		ft_putchar('\n');
+	ft_putchar(!n ? '\n' : 0);
 	return (0);
 }

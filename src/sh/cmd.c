@@ -38,7 +38,13 @@ static int	lookup_path(const char *fn, char **av, char **path)
 	int		i;
 
 	ret = -1;
-	if (path)
+	if (ft_strnequ(fn, "./", 2))
+	{
+		full = ft_strjoin("./", fn);
+		ret = execv(full, av);
+		ft_strdel(&full);
+	}
+	else if (path)
 	{
 		i = 0;
 		while (*(path + i))
